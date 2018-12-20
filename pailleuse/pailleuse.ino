@@ -1,67 +1,66 @@
-#include <Wire.h>
 #include "WiFiEsp.h"
-#include "rgb_lcd.h"
-
-
-// LCD
-rgb_lcd lcd;
-
-const int colorR = 255;
-const int colorG = 0;
-const int colorB = 0;
+#include "multi_channel_relay.h"
 
 // WiFi
 WiFiEspServer server(80);
-RingBuffer buf(8);
+RingBuffer buf(20);
+
+// Debug
+Multi_Channel_Relay relay;
 
 
-bool beginAP()
+void debug(int i)
 {
-  return WiFi.beginAP("Pailleuse");
+  if (1 <= i && i <= 4) {
+    relay.turn_on_channel(i);
+    return;
+  }
+  for (int k = 1; k < 5; k++) {
+    relay.turn_off_channel(k);
+  }
+}
+
+
+int connectAP()
+{
+  return WiFi.begin("Meca", "");
+}
+
+
+void htmlHeader(WiFiEspClient client)
+{
+  client.println("HTTP/1.1 200 OK");
+  client.println("Content-type:text/html");
+  client.println();
+}
+
+
+void htmlFooter(WiFiEspClient client)
+{
+  client.println();
+  client.println();
 }
 
 
 void setup()
 {
-  lcd.begin(20, 2);
-  lcd.setRGB(colorR, colorG, colorB);
-  lcd.print("Starting...");
+  // Debug
+  relay.begin(0x21);
+  debug(0);
   
   Serial.begin(115200);
   WiFi.init(&Serial);
-  if (WiFi.status() == WL_NO_SHIELD) {
-    lcd.home();
-    lcd.print("No Wifi shield");
-    lcd.setCursor(0, 1);
-    lcd.print("Retrying...");
+  
+  while (WiFi.status() == WL_NO_SHIELD) {
+    delay(1000);
   }
   
-  int retry = 0;
-  while (WiFi.status() == WL_NO_SHIELD)
-  {
-    lcd.setCursor(12, 1);
-    lcd.print(retry);
-    retry++;
-    WiFi.init(&Serial);
-  }
-  
-  while (!beginAP()) {
-    lcd.clear();
-    lcd.home();
-    lcd.print("Cannot start AP");
-    lcd.setCursor(0, 1);
-    lcd.print("Retrying...");
-    lcd.print(retry);
-    retry++;
-  }
+  while (connectAP() != WL_CONNECTED);
 
-  IPAddress ip(192, 168, 168, 100);
-  WiFi.configAP(ip);
+  IPAddress ip(192, 168, 168, 101);
+  WiFi.config(ip);
   server.begin();
-  
-  lcd.clear();
-  lcd.home();
-  lcd.print(WiFi.localIP());
+  debug(1);
 }
 
 
@@ -79,36 +78,22 @@ void loop()
       buf.push(c);
 
       if (buf.endsWith("\r\n\r\n")) {
-          sendHttpResponse(client);
-          break;
+        htmlHeader(client);
+        client.print("Pailleuse");
+        htmlFooter(client);
+        break;
       }
 
       if (buf.endsWith("GET /on")) {
-        lcd.setCursor(0, 1);
-        lcd.print("on ");
+        debug(2);
       }
       else if (buf.endsWith("GET /off")) {
-        lcd.setCursor(0, 1);
-        lcd.print("off");
+        debug(3);
       }
     }
   }
 
+  // Give the web browser time to receive the data
+  delay(10);
   client.stop();
-}
-
-
-void sendHttpResponse(WiFiEspClient client)
-{
-  client.println("HTTP/1.1 200 OK");
-  client.println("Content-type:text/html");
-  client.println();
-
-  client.print("<a href='http://");
-  client.print(WiFi.localIP());
-  client.print("/on'>On</a> / <a href='http://");
-  client.print(WiFi.localIP());
-  client.print("/off'>Off</a>");
-
-  client.println();
 }
