@@ -17,7 +17,7 @@ RingBuffer buf(8);
 
 bool beginAP()
 {
-  return WiFi.beginAP("Arduino", 10);
+  return WiFi.beginAP("Pailleuse");
 }
 
 
@@ -55,25 +55,22 @@ void setup()
     retry++;
   }
 
-  IPAddress ip(192, 168, 168, 168);
-  //WiFi.configAP(ip);
+  IPAddress ip(192, 168, 168, 100);
+  WiFi.configAP(ip);
   server.begin();
+  
   lcd.clear();
+  lcd.home();
+  lcd.print(WiFi.localIP());
 }
 
 
 void loop()
 {
-  lcd.home();
-  lcd.print(WiFi.localIP());
-  
   WiFiEspClient client = server.available();
   if (!client) {
     return;
   }
-
-  lcd.home();
-  lcd.print("Client connected");
 
   buf.init();
   while (client.connected()) {
@@ -107,7 +104,11 @@ void sendHttpResponse(WiFiEspClient client)
   client.println("Content-type:text/html");
   client.println();
 
-  client.print("Arduino te salue !");
+  client.print("<a href='http://");
+  client.print(WiFi.localIP());
+  client.print("/on'>On</a> / <a href='http://");
+  client.print(WiFi.localIP());
+  client.print("/off'>Off</a>");
 
   client.println();
 }
