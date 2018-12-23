@@ -1,8 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
-<p>{{ exp_name }}</p>
 <form action="{{ url_for('stop_exp') }}" method="post">
     <input type="submit" value="Stop" />
 </form>
-<p>{{ measures }}</p>
+{{ plot|safe }}
 {% endblock %}

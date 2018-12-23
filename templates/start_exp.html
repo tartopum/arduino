@@ -5,8 +5,7 @@
     <input type="submit" value="Start" />
 </form>
 
-{% for t, name, data in exps %}
-    <p><strong>{{ name }}</strong> ({{ t }})</p>
-    <p style="margin-bottom: 20px;">{{ data}}</p>
+{% for t, name, plot in exps %}
+    {{ plot|safe }}
 {% endfor %}
 {% endblock %}
