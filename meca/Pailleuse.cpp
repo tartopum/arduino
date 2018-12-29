@@ -33,7 +33,7 @@ void Pailleuse::loop()
 
 void Pailleuse::computeSpeed()
 {
-    _speed = analogRead(_pinSpeed);
+    _speed = 1023 - analogRead(_pinSpeed);
     if (isOn(_pinBackward)) {
         _speedToSend = -1 * _speed;
     }

@@ -2,7 +2,7 @@
 #include "LCD.h"
 //#include "WiFi.h"
 
-Pailleuse pailleuse(2, A1, 6, 7);
+Pailleuse pailleuse(2, A1, 3, 4);
 
 void setup()
 {
