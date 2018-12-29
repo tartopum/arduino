@@ -14,7 +14,7 @@ class Pailleuse
         void computeSpeed();
         bool canSend();
         byte speedAccuracy = 5; // To ignore potentiometer noise
-        byte delayBetweenMessages = 200; // ms
+        byte delayBetweenMessages = 100; // ms
 
     private:
         int _pinTransmitter;
