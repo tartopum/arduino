@@ -3,29 +3,44 @@
 
 #include <Arduino.h>
 #include <VirtualWire.h>
+#include "Switch.h"
 
 class Pailleuse
 {
     public:
-        Pailleuse(int pinTransmitter, int pinSpeed, int pinForward, int pinBackward);
+        Pailleuse(
+            byte pinTransmitter,
+            byte pinSpeed,
+            byte pinsRotor[2],
+            byte pinsTuret[2],
+            byte pinsLoadingArm[2],
+            byte pinsConveyorBelt[2]
+        );
         void setup();
         void loop();
-        void sendSpeed();
-        void computeSpeed();
-        bool canSend();
-        byte speedAccuracy = 5; // To ignore potentiometer noise
-        byte delayBetweenMessages = 100; // ms
+
+        byte speedMinDelta = 3; // To ignore potentiometer noise
+        byte delayBetweenMessages = 20; // ms
 
     private:
-        int _pinTransmitter;
-        int _pinSpeed;
-        int _pinForward;
-        int _pinBackward;
+        byte _pinTransmitter;
+        byte _pinSpeed;
         int _bitsPerSec = 2000;
+
+        Switch _rotor;
+        Switch _turet;
+        Switch _loadingArm;
+        Switch _conveyorBelt;
+
         unsigned int _speed = 0; // 0 <= _speed < 1024
-        int _speedToSend = 0;
-        int _lastSentSpeed = 0;
-        unsigned long _lastMsgTime = 0; // To ignore button noise
+        unsigned int _speedToSend = 0;
+        unsigned int _lastSpeedSent = 0;
+
+        void _sendAll(bool noDuplicate = true);
+        void _computeSpeed();
+        void _sendMsg(char *msg);
+        void _sendSpeed(bool noDuplicate = true);
+        void _sendSwitchState(Switch *sw, bool noDuplicate = true);
 };
 
 #endif
