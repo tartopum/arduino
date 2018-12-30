@@ -57,7 +57,7 @@ void Pailleuse::sendSpeed()
 {
     _lastMsgTime = millis();
     _lastSentSpeed = _speedToSend;
-    char msg[10];
-    String(_speedToSend).toCharArray(msg, 10);
+    char msg[15];
+    sprintf(msg, "speed=%i", _speedToSend);
     vw_send((uint8_t *)msg, strlen(msg));
 }
