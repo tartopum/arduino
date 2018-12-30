@@ -11,6 +11,10 @@ Switch::Switch(
     _idRelayLeft = idRelayLeft;
     _multiRelayRight = multiRelayRight;
     _idRelayRight = idRelayRight;
+}
+
+void Switch::setup()
+{
     _cmdRelays();
 }
 

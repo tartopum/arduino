@@ -51,6 +51,11 @@ void setup()
     multiRelay1.begin(0x11);
     multiRelay2.begin(0x21);
 
+    rotor.setup();
+    turet.setup();
+    loadingArm.setup();
+    conveyorBelt.setup();
+
     vw_set_rx_pin(RF_RX_PIN);
     vw_setup(BITS_PER_SEC);
     vw_rx_start();
@@ -64,15 +69,15 @@ void loop()
     uint8_t bufLen = MAX_MSG_LEN;
     if(!vw_get_message(buf, &bufLen)) return;
 
-    char key[10];
-    char val[10];
+    char key[15];
+    char val[15];
     parseMsg(buf, bufLen, key, val);
     
     if (strcmp(key, "speed") == 0) {
         changeSpeed(atoi(val));
     }
     else {
-        switch_state_t state = atoi(val);
+        switch_state_t state = (switch_state_t)atoi(val);
         if (strcmp(key, "rotor") == 0) rotor.setState(state);
         if (strcmp(key, "turet") == 0) turet.setState(state);
         if (strcmp(key, "loadingArm") == 0) loadingArm.setState(state);

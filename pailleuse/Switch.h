@@ -19,6 +19,7 @@ class Switch
             Multi_Channel_Relay *multiRelayRight,
             byte idRelayRight
         );
+        void setup();
         void setState(switch_state_t);
         bool isActive();
 
