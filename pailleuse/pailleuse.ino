@@ -73,19 +73,15 @@ void loop()
     char val[15];
     parseMsg(buf, bufLen, key, val);
 
-    Serial.print(key);
-    Serial.print(" = ");
-    Serial.println(val);
-    
-    if (strcmp(key, "speed") == 0) {
+    if (strcmp(key, "s") == 0) {
         changeSpeed(atoi(val));
     }
     else {
         switch_state_t state = (switch_state_t)atoi(val);
-        if (strcmp(key, "rotor") == 0) rotor.setState(state);
-        if (strcmp(key, "turet") == 0) turet.setState(state);
-        if (strcmp(key, "loadingArm") == 0) loadingArm.setState(state);
-        if (strcmp(key, "conveyorBelt") == 0) conveyorBelt.setState(state);
+        if (strcmp(key, "r") == 0) rotor.setState(state);
+        if (strcmp(key, "t") == 0) turet.setState(state);
+        if (strcmp(key, "l") == 0) loadingArm.setState(state);
+        if (strcmp(key, "c") == 0) conveyorBelt.setState(state);
     }
 
     if (rotor.isActive() || turet.isActive() || loadingArm.isActive() || conveyorBelt.isActive()) {

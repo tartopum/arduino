@@ -15,7 +15,7 @@ bool isOn(int pinBtn)
     return (digitalRead(pinBtn) == LOW);
 }
 
-switch_state_t Switch::readState()
+switch_state_t Switch::getState()
 {
     return _state;
 }

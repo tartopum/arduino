@@ -8,10 +8,10 @@ Pailleuse::Pailleuse(
     byte pinsLoadingArm[2],
     byte pinsConveyorBelt[2]
 ) :
-    _rotor("rotor", pinsRotor[0], pinsRotor[1]),
-    _turet("turet", pinsTuret[0], pinsTuret[1]),
-    _loadingArm("loadingArm", pinsLoadingArm[0], pinsLoadingArm[1]),
-    _conveyorBelt("conveyorBelt", pinsConveyorBelt[0], pinsConveyorBelt[1])
+    _rotor("r", pinsRotor[0], pinsRotor[1]),
+    _turet("t", pinsTuret[0], pinsTuret[1]),
+    _loadingArm("l", pinsLoadingArm[0], pinsLoadingArm[1]),
+    _conveyorBelt("c", pinsConveyorBelt[0], pinsConveyorBelt[1])
 {
     _pinTransmitter = pinTransmitter;
     _pinSpeed = pinSpeed;
@@ -56,7 +56,7 @@ void Pailleuse::_computeSpeed()
         _speed = newSpeed;
     }
 
-    if (_rotor.readState() == RIGHT) {
+    if (_rotor.getState() == RIGHT) {
         _speedToSend = _speed;
     }
     else {
@@ -87,13 +87,12 @@ void Pailleuse::_sendSpeed(bool force)
     _lastTimeSpeedSent = millis();
     _lastSpeedSent = _speedToSend;
     char msg[15];
-    sprintf(msg, "speed=%i", _speedToSend);
+    sprintf(msg, "s=%i", _speedToSend);
     _sendMsg(msg);
 }
 
 void Pailleuse::_sendMsg(char *msg)
 {
-    Serial.println(msg);
     vw_send((uint8_t *)msg, strlen(msg));
     vw_wait_tx();
 }

@@ -14,7 +14,7 @@ class Switch
     public:
         Switch(const char *name, byte pinLeft, byte pinRight);
         bool hasChanged();
-        switch_state_t readState();
+        switch_state_t getState();
         void toMsg(char *dest);
         unsigned long lastTimeSent = 0;
 
