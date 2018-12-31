@@ -16,6 +16,8 @@ class Switch
         bool hasChanged();
         switch_state_t readState();
         void toMsg(char *dest);
+        unsigned long lastTimeSent = 0;
+
         byte debounceDelay = 50;
 
     private:

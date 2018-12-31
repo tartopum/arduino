@@ -46,7 +46,7 @@ void changeSpeed(int targetSpeed)
 
 void setup()
 {
-    Serial.begin(9600);
+    Serial.begin(9600); // TODO
 
     multiRelay1.begin(0x11);
     multiRelay2.begin(0x21);
@@ -72,6 +72,10 @@ void loop()
     char key[15];
     char val[15];
     parseMsg(buf, bufLen, key, val);
+
+    Serial.print(key);
+    Serial.print(" = ");
+    Serial.println(val);
     
     if (strcmp(key, "speed") == 0) {
         changeSpeed(atoi(val));

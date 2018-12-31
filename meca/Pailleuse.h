@@ -20,7 +20,9 @@ class Pailleuse
         void loop();
 
         byte speedMinDelta = 3; // To ignore potentiometer noise
-        byte delayBetweenMessages = 20; // ms
+        // The receiver needs time to treat the message
+        byte delayBetweenMessages = 200; // ms
+        unsigned long repeatDelay = 1000;
 
     private:
         byte _pinTransmitter;
@@ -35,12 +37,14 @@ class Pailleuse
         unsigned int _speed = 0; // 0 <= _speed < 1024
         unsigned int _speedToSend = 0;
         unsigned int _lastSpeedSent = 0;
+        unsigned long _lastTimeSpeedSent = 0;
 
-        void _sendAll(bool noDuplicate = true);
+        bool _canSend(bool, bool, unsigned long);
+        void _sendAll(bool force = false);
         void _computeSpeed();
         void _sendMsg(char *msg);
-        void _sendSpeed(bool noDuplicate = true);
-        void _sendSwitchState(Switch *sw, bool noDuplicate = true);
+        void _sendSpeed(bool force = false);
+        void _sendSwitchState(Switch *sw, bool force = false);
 };
 
 #endif

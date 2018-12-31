@@ -21,31 +21,31 @@ void Pailleuse::setup()
 {
     vw_set_tx_pin(_pinTransmitter);
     vw_setup(_bitsPerSec);
-    _sendAll(false);
+    _sendAll(true);
 }
 
 void Pailleuse::loop()
 {
-    _sendAll(true);
+    _sendAll(false);
 }
 
-void Pailleuse::_sendAll(bool noDuplicate)
+void Pailleuse::_sendAll(bool force)
 {
     _computeSpeed();
 
-    _sendSpeed(noDuplicate);
+    _sendSpeed(force);
     delay(delayBetweenMessages);
 
-    _sendSwitchState(&_rotor, noDuplicate);
+    _sendSwitchState(&_rotor, force);
     delay(delayBetweenMessages);
     
-    _sendSwitchState(&_turet, noDuplicate);
+    _sendSwitchState(&_turet, force);
     delay(delayBetweenMessages);
     
-    _sendSwitchState(&_loadingArm, noDuplicate);
+    _sendSwitchState(&_loadingArm, force);
     delay(delayBetweenMessages);
     
-    _sendSwitchState(&_conveyorBelt, noDuplicate);
+    _sendSwitchState(&_conveyorBelt, force);
     delay(delayBetweenMessages);
 }
 
@@ -64,17 +64,27 @@ void Pailleuse::_computeSpeed()
     }
 }
 
-void Pailleuse::_sendSwitchState(Switch *sw, bool noDuplicate)
+bool Pailleuse::_canSend(bool changed, bool force, unsigned long lastTimeSent)
 {
-    if (!sw->hasChanged() && noDuplicate) return;
+    if (force) return true;
+    if (changed) return true;
+    return ((millis() - lastTimeSent) > repeatDelay);
+}
+
+void Pailleuse::_sendSwitchState(Switch *sw, bool force)
+{
+    if (!_canSend(sw->hasChanged(), force, sw->lastTimeSent)) return;
+    sw->lastTimeSent = millis();
     char msg[30];
     sw->toMsg(msg);
     _sendMsg(msg);
 }
 
-void Pailleuse::_sendSpeed(bool noDuplicate)
+void Pailleuse::_sendSpeed(bool force)
 {
-    if (_lastSpeedSent == _speedToSend && noDuplicate) return;
+    if (!_canSend(_lastSpeedSent != _speedToSend, force, _lastTimeSpeedSent)) return;
+
+    _lastTimeSpeedSent = millis();
     _lastSpeedSent = _speedToSend;
     char msg[15];
     sprintf(msg, "speed=%i", _speedToSend);
